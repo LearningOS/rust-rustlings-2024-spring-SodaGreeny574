@@ -31,11 +31,11 @@ struct LinkedList<T> {
 
 impl<T> Default for LinkedList<T> {
     fn default() -> Self {
-        Self::new()
+        LinkedList::<T>::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Clone + PartialOrd+ PartialEq> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -71,6 +71,34 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
+        let mut merged_list = LinkedList::<T>::new();
+        let mut curr_a = list_a.start;
+        let mut curr_b = list_b.start;
+
+        while curr_a.is_some() && curr_b.is_some() {
+            let val_a = unsafe { (*curr_a.unwrap().as_ptr()).val.clone() };
+            let val_b = unsafe { (*curr_b.unwrap().as_ptr()).val.clone() };
+
+            if val_a <= val_b {
+                merged_list.add(val_a);
+                curr_a = unsafe { (*curr_a.unwrap().as_ptr()).next };
+            } else {
+                merged_list.add(val_b);
+                curr_b = unsafe { (*curr_b.unwrap().as_ptr()).next };
+            }
+        }
+
+        while curr_a.is_some() {
+            let val_a = unsafe { (*curr_a.unwrap().as_ptr()).val.clone() };
+            merged_list.add(val_a);
+            curr_a = unsafe { (*curr_a.unwrap().as_ptr()).next };
+        }
+
+        while curr_b.is_some() {
+            let val_b = unsafe { (*curr_b.unwrap().as_ptr()).val.clone() };
+            merged_list.add(val_b);
+            curr_b = unsafe { (*curr_b.unwrap().as_ptr()).next };
+        }
 		//TODO
 		Self {
             length: 0,
